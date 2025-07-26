@@ -1,9 +1,10 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
 import { getAllUsers, updateUserRole, deleteUserById } from "@/lib/actions/admin.actions";
+import { Models } from "node-appwrite";
 
 type User = {
   $id: string;
@@ -17,16 +18,19 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await getAllUsers();
+      const res: Models.Document[] = await getAllUsers();
+
       if (res) {
-  const formattedUsers: User[] = res.map((doc: any) => ({
-    $id: doc.$id,
-    fullName: doc.fullName,
-    email: doc.email,
-    role: doc.role,
-  }));
-  setUsers(formattedUsers);
-}
+        const formattedUsers: User[] = res.map((doc) => {
+          return {
+            $id: doc.$id,
+            fullName: (doc as any).fullName ?? "Unknown",
+            email: (doc as any).email ?? "unknown@example.com",
+            role: (doc as any).role ?? "user",
+          };
+        });
+        setUsers(formattedUsers);
+      }
     };
 
     fetchUsers();
@@ -48,13 +52,15 @@ export default function AdminDashboard() {
     <div className="p-6 space-y-8">
       <div className="text-2xl font-semibold text-[#FA7275]">Admin Dashboard</div>
 
-      {/* <Card className="bg-pink-100 shadow-md p-6 rounded-2xl">
+      {/* Uncomment if you want the card again
+      <Card className="bg-pink-100 shadow-md p-6 rounded-2xl">
         <CardContent className="flex flex-col items-center space-y-2">
           <div className="text-5xl font-bold text-[#FA7275]">.02%</div>
           <div className="text-gray-600">Space used</div>
           <div className="text-sm text-gray-500">Available: 317.0 KB / 2GB</div>
         </CardContent>
-      </Card> */}
+      </Card> 
+      */}
 
       <div>
         <h2 className="text-xl font-semibold mb-4">Manage Users</h2>
